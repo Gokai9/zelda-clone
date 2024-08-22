@@ -1,7 +1,14 @@
-import pygame, os
+import pygame
+from code.settings import *
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self, pos, groups) -> None:
+    def __init__(self, pos, groups, sprite_type, surface = pygame.Surface((TILESIZE, TILESIZE)) ) -> None:
         super().__init__(groups)
-        self.image = pygame.image.load(os.path.join('./resources/graphics/test', 'rock.png')).convert_alpha()
-        self.rect = self.image.get_rect(topleft = pos)
+        self.image = surface
+        self.sprite_type = sprite_type
+        if sprite_type == "object":
+            self.rect = self.image.get_rect(topleft = (pos[0], pos[1]))
+        else:
+            self.rect = self.image.get_rect(topleft = pos)
+        self.hitbox = self.rect.inflate(0, -10)
+        
