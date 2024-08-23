@@ -5,5 +5,18 @@ from code.player import Player
 class Weapon(pygame.sprite.Sprite):
     def __init__(self, player: Player, groups) -> None:
         super().__init__(groups)
-        self.image = pygame.surface.Surface((40, 40))
-        self.rect = self.image.get_rect(center=player.rect.center)
+        direction = player.status.split('_')[0]
+        path = f"./resources/graphics/weapons/{player.weapon_type}/{direction}.png"
+        if direction == "up":
+            self.image = pygame.image.load(path)
+            self.rect = self.image.get_rect(midtop=player.rect.midtop)
+        elif direction == "down":
+            self.image = pygame.image.load(path)
+            self.rect = self.image.get_rect(midbottom=player.rect.midbottom)
+        elif direction == "right":
+            self.image = pygame.image.load(path)
+            self.rect = self.image.get_rect(midright=player.rect.midright + pygame.math.Vector2(20,10))
+        else:
+            self.image = pygame.image.load(path)
+            self.rect = self.image.get_rect(midleft=player.rect.midleft)
+        

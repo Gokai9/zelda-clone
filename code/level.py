@@ -1,10 +1,10 @@
 import pygame
-from code.settings import WORLD_MAP, TILESIZE
+from code.settings import *
 from code.player import Player
 from code.tile import Tile
 from code.help import *
 from random import choice
-
+from code.ui import UI
 from code.weapon import Weapon
 
 class Level:
@@ -12,13 +12,15 @@ class Level:
         self.display_surface = pygame.display.get_surface()
         self.visible_sprites = YCamera()
         self.obstacles_sprites = pygame.sprite.Group()
+        self.ui = UI()
+        self.weapon = None
         self.create_map()
         
     def create_map(self) -> None:
         layouts = {
             "block": csv_tolist("./resources/map/map_FloorBlocks.csv"),
             "grass": csv_tolist("./resources/map/map_Grass.csv"),
-            "object": csv_tolist("./resources/map/map_LargeObjects.csv")
+            "object": csv_tolist("./resources/map/map_Objects.csv")
         }
         grap = {
             "grass": import_folder("./resources/graphics/grass"),
@@ -37,13 +39,19 @@ class Level:
                         if layout == "object":
                             obj = grap["objects"][int(y_arr)]
                             Tile((x, y), [self.obstacles_sprites, self.visible_sprites], "object", obj)
-        self.player = Player((1945, 900), [self.visible_sprites], self.obstacles_sprites, self.set_attack)
+        self.player = Player((1945, 900), [self.visible_sprites], self.obstacles_sprites, self.set_attack, self.destroy_weapon)
     def set_attack(self):
         self.weapon = Weapon(self.player, [self.visible_sprites])
+
+    def destroy_weapon(self):
+        if self.weapon:
+            self.weapon.kill()
+        self.weapon = None
 
     def run(self) -> None:
         self.visible_sprites.custom_draw(self.player)
         self.visible_sprites.update()
+        self.ui.display(self.player)
 
 class YCamera(pygame.sprite.Group):
     def __init__(self) -> None:
