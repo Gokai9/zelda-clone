@@ -2,8 +2,9 @@ import pygame
 from code.debug import debug
 from code.help import import_folder
 from code.settings import *
+from code.entity import *
 
-class Player(pygame.sprite.Sprite):
+class Player(Entity):
     def __init__(self, pos, groups, sprite, set_attack, destroy_weapon) -> None:
         super().__init__(groups)
         self.image = pygame.image.load('./resources/graphics/test/player.png').convert_alpha()
@@ -14,7 +15,6 @@ class Player(pygame.sprite.Sprite):
                             "right": [], "right_attack": [], "right_idle": [],
                             "left": [], "left_attack": [], "left_idle": []}
         self.image_player()
-        self.direction = pygame.math.Vector2()
         self.speed = 7
         self.attacking = False
         self.attack_cooldown = 1000
@@ -33,6 +33,7 @@ class Player(pygame.sprite.Sprite):
         self.stats = {"health": 100, "mana": 50, "attack": 10, "magic": 5, "speed": 5}
         self.health = self.stats["health"] * 0.7
         self.mana = self.stats["mana"] * 0.9
+        self.exp = 123
         self.obstacles_sprites = sprite
 
     def image_player(self):
@@ -68,10 +69,12 @@ class Player(pygame.sprite.Sprite):
             self.attack_time = pygame.time.get_ticks()
         if keys[pygame.K_q] and self.can_switch_weapon:
             self.can_switch_weapon = False
-            self.weapon_type = list(weapon_data.keys())[self.weapon_index]
-            self.weapon_index += 1
-            if self.weapon_index >= len(self.weapon_type):
+            self.weapon_time = pygame.time.get_ticks()
+            if self.weapon_index < len(weapon_data) - 1:
+                self.weapon_index += 1
+            else:
                 self.weapon_index = 0
+            self.weapon_type = list(weapon_data.keys())[self.weapon_index]
             
     def get_status(self):
         if self.direction.x == 0 and self.direction.y == 0 and not self.attacking:
@@ -82,31 +85,6 @@ class Player(pygame.sprite.Sprite):
         if self.attacking:
             self.status = self.status.replace("_idle", "_attack")
         
-    def move(self, speed):
-        # if both x, y value not == 0
-        if self.direction.magnitude() != 0:
-            self.direction = self.direction.normalize()
-        self.hitbox.y += self.direction.y * speed
-        self.collission_detector('vertical')
-        self.hitbox.x += self.direction.x * speed
-        self.collission_detector('horizontal')
-        self.rect.center = self.hitbox.center
-
-    def collission_detector(self, direction):
-        if direction == 'vertical':
-            for sprite in self.obstacles_sprites:
-                if sprite.hitbox.colliderect(self.hitbox):
-                    if self.direction.y > 0:
-                        self.hitbox.bottom = sprite.hitbox.top
-                    if self.direction.y < 0:
-                        self.hitbox.top = sprite.hitbox.bottom
-        if direction == 'horizontal':
-            for sprite in self.obstacles_sprites:
-                if sprite.hitbox.colliderect(self.hitbox):
-                    if self.direction.x > 0:
-                        self.hitbox.right = sprite.hitbox.left
-                    if self.direction.x < 0:
-                        self.hitbox.left = sprite.hitbox.right
     def cooldowns(self):
         current_time = pygame.time.get_ticks()
         if current_time - self.attack_time >= self.attack_cooldown:
@@ -114,8 +92,7 @@ class Player(pygame.sprite.Sprite):
             self.destroy_weapon()
             self.get_status()
         if current_time - self.weapon_time >= self.switch_weapon_cooldown:
-            self.can_switch_weapon = True
-            
+            self.can_switch_weapon = True        
 
     def animate(self):
         animation = self.animations[self.status]

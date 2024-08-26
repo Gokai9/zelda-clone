@@ -50,9 +50,9 @@ class Level:
 
     def run(self) -> None:
         self.visible_sprites.custom_draw(self.player)
-        self.visible_sprites.update()
         self.ui.display(self.player)
-
+        self.visible_sprites.update()
+        
 class YCamera(pygame.sprite.Group):
     def __init__(self) -> None:
         super().__init__()
