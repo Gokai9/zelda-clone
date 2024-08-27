@@ -1,4 +1,5 @@
 import pygame
+from code.enemy import Enemy
 from code.settings import *
 from code.player import Player
 from code.tile import Tile
@@ -20,7 +21,8 @@ class Level:
         layouts = {
             "block": csv_tolist("./resources/map/map_FloorBlocks.csv"),
             "grass": csv_tolist("./resources/map/map_Grass.csv"),
-            "object": csv_tolist("./resources/map/map_Objects.csv")
+            "object": csv_tolist("./resources/map/map_Objects.csv"),
+            "entity": csv_tolist("./resources/map/map_Entities.csv")
         }
         grap = {
             "grass": import_folder("./resources/graphics/grass"),
@@ -39,7 +41,15 @@ class Level:
                         if layout == "object":
                             obj = grap["objects"][int(y_arr)]
                             Tile((x, y), [self.obstacles_sprites, self.visible_sprites], "object", obj)
-        self.player = Player((1945, 900), [self.visible_sprites], self.obstacles_sprites, self.set_attack, self.destroy_weapon)
+                        if layout == "entity":
+                            if y_arr != "394":
+                                monster_name = "bamboo"
+                                if y_arr == "391": monster_name = "spirit"
+                                if y_arr == "392": monster_name = "raccoon"
+                                if y_arr == "393": monster_name = "squid"
+                                Enemy(monster_name, (x, y), [self.visible_sprites], 'idle')
+                            else:
+                                self.player = Player((x, y), [self.visible_sprites], self.obstacles_sprites, self.set_attack, self.destroy_weapon)
     def set_attack(self):
         self.weapon = Weapon(self.player, [self.visible_sprites])
 

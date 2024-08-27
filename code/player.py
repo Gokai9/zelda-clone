@@ -21,14 +21,19 @@ class Player(Entity):
         self.attack_time = pygame.time.get_ticks()
         self.set_attack = set_attack
         self.destroy_weapon = destroy_weapon
-        self.frame = 0
-        self.animate_time = 0.15
+        
         #switch weapon
         self.weapon_index = 0
         self.weapon_type = list(weapon_data.keys())[int(self.weapon_index)]
         self.can_switch_weapon = True
         self.weapon_time = pygame.time.get_ticks()
         self.switch_weapon_cooldown = 300
+        #switch magic
+        self.magic_index = 0
+        #self.magic_type = list(weapon_data.keys())[int(self.weapon_index)]
+        self.can_switch_magic = True
+        self.magic_time = pygame.time.get_ticks()
+        self.switch_magic_cooldown = 300
         self.status = "down"
         self.stats = {"health": 100, "mana": 50, "attack": 10, "magic": 5, "speed": 5}
         self.health = self.stats["health"] * 0.7
@@ -67,6 +72,7 @@ class Player(Entity):
         if keys[pygame.K_LCTRL] and not self.attacking:
             self.attacking = True
             self.attack_time = pygame.time.get_ticks()
+
         if keys[pygame.K_q] and self.can_switch_weapon:
             self.can_switch_weapon = False
             self.weapon_time = pygame.time.get_ticks()
@@ -75,6 +81,13 @@ class Player(Entity):
             else:
                 self.weapon_index = 0
             self.weapon_type = list(weapon_data.keys())[self.weapon_index]
+        if keys[pygame.K_m] and self.can_switch_magic:
+            self.can_switch_magic = False
+            self.weapon_time = pygame.time.get_ticks()
+            if self.magic_index < len(magic_data) -1:
+                self.magic_index += 1
+            else:
+                self.magic_index = 0
             
     def get_status(self):
         if self.direction.x == 0 and self.direction.y == 0 and not self.attacking:
@@ -93,13 +106,10 @@ class Player(Entity):
             self.get_status()
         if current_time - self.weapon_time >= self.switch_weapon_cooldown:
             self.can_switch_weapon = True        
+        if current_time - self.magic_time >= self.switch_magic_cooldown:
+            self.can_switch_magic = True  
 
-    def animate(self):
-        animation = self.animations[self.status]
-        self.frame += self.animate_time
-        if self.frame > len(animation):
-            self.frame = 0
-        self.image = animation[int(self.frame)]
+    
         #self.rect = self.image.get_rect(topleft = self.)
 
     def update(self):

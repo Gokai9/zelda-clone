@@ -3,7 +3,8 @@ class Entity(pygame.sprite.Sprite):
     def __init__(self, *groups) -> None:
         super().__init__(*groups)
         self.direction = pygame.math.Vector2()
-        
+        self.frame = 0
+        self.animate_time = 0.15
     def move(self, speed):
         # if both x, y value not == 0
         if self.direction.magnitude() != 0:
@@ -29,3 +30,9 @@ class Entity(pygame.sprite.Sprite):
                         self.hitbox.right = sprite.hitbox.left
                     if self.direction.x < 0:
                         self.hitbox.left = sprite.hitbox.right
+    def animate(self):
+        animation = self.animations[self.status]
+        self.frame += self.animate_time
+        if self.frame > len(animation):
+            self.frame = 0
+        self.image = animation[int(self.frame)]

@@ -13,6 +13,11 @@ class UI:
             weapon = val['graphic']
             image = pygame.image.load(weapon).convert_alpha()
             self.weapon_graphics.append(image)
+        self.magic_graphics = []
+        for val in magic_data.values():
+            magic = val["graphic"]
+            image = pygame.image.load(magic).convert_alpha()
+            self.magic_graphics.append(image)
 
     def draw_bar(self, health, stats, bar_rect, color):
         pygame.draw.rect(self.display_surface, UI_BG_COLOR, bar_rect)
@@ -22,6 +27,7 @@ class UI:
         rect_copy.width = current_width
         pygame.draw.rect(self.display_surface, color, rect_copy)
         pygame.draw.rect(self.display_surface, UI_BORDER_COLOR, bar_rect, 3)
+        
     def select_box(self, top, left, switch):
         box = pygame.Rect(top, left, ITEM_BOX_SIZE, ITEM_BOX_SIZE)
         pygame.draw.rect(self.display_surface, UI_BG_COLOR, box)
@@ -37,8 +43,11 @@ class UI:
         rect = image.get_rect(center = box.center)
         self.display_surface.blit(image, rect)
 
-    def change_magic(self):
-        box = self.select_box(100, 620, True)
+    def change_magic(self, index_magic, switch):
+        box = self.select_box(100, 620, switch)
+        image = self.magic_graphics[index_magic]
+        rect = image.get_rect(center = box.center)
+        self.display_surface.blit(image, rect)
         
     def show_exp(self, text):
         text_surf = self.font.render(str(int(text)), False, TEXT_COLOR)
@@ -54,3 +63,4 @@ class UI:
 
         self.show_exp(player.exp)
         self.change_weapon(player.weapon_index, not player.can_switch_weapon)
+        self.change_magic(player.magic_index, not player.can_switch_magic)
