@@ -21,7 +21,6 @@ class Player(Entity):
         self.attack_time = pygame.time.get_ticks()
         self.set_attack = set_attack
         self.destroy_weapon = destroy_weapon
-        
         #switch weapon
         self.weapon_index = 0
         self.weapon_type = list(weapon_data.keys())[int(self.weapon_index)]
@@ -36,7 +35,7 @@ class Player(Entity):
         self.switch_magic_cooldown = 300
         self.status = "down"
         self.stats = {"health": 100, "mana": 50, "attack": 10, "magic": 5, "speed": 5}
-        self.health = self.stats["health"] * 0.7
+        self.health = self.stats["health"]
         self.mana = self.stats["mana"] * 0.9
         self.exp = 123
         self.obstacles_sprites = sprite
@@ -88,7 +87,9 @@ class Player(Entity):
                 self.magic_index += 1
             else:
                 self.magic_index = 0
-            
+    def damage_from_player(self):
+        print(self.weapon_type)
+        return self.stats["attack"] + weapon_data[self.weapon_type]['damage']
     def get_status(self):
         if self.direction.x == 0 and self.direction.y == 0 and not self.attacking:
             if "_attack" in self.status:
@@ -105,12 +106,9 @@ class Player(Entity):
             self.destroy_weapon()
             self.get_status()
         if current_time - self.weapon_time >= self.switch_weapon_cooldown:
-            self.can_switch_weapon = True        
+            self.can_switch_weapon = True    
         if current_time - self.magic_time >= self.switch_magic_cooldown:
-            self.can_switch_magic = True  
-
-    
-        #self.rect = self.image.get_rect(topleft = self.)
+            self.can_switch_magic = True
 
     def update(self):
         debug(self.status)
